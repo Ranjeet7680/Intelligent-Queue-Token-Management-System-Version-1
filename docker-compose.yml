@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  api:
+    build: ./api
+    env_file: ./api/.env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - qtm_net
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: qtm
+      POSTGRES_PASSWORD: qtm_pass
+      POSTGRES_DB: qtm_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - qtm_net
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - qtm_net
+
+volumes:
+  pgdata:
+
+networks:
+  qtm_net:
